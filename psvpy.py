@@ -416,17 +416,5 @@ def PSVliquidRate(areaMM2, P, Pback, d, mu):
 #    return (i)  # mass flow rate kg/h
 
 
-getKsh(300.0, 300.0)
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
 
 
