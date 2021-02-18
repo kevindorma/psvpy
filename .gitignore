@@ -1,2 +1,3 @@
 # .gitignore
-# blank for now
+__pycache__
+*ipynb*
