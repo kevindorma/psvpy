@@ -1,2 +1,2 @@
-from psvpy import myTest
-from psvpy import psvpy
+from .psvpy import myTest
+from .psvpy import psvpy
