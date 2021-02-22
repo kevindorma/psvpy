@@ -25,7 +25,7 @@
 
 import numpy as np
 import pandas as pd
-#import math
+import math
 import scipy as sp
 from scipy import interpolate
 
@@ -170,14 +170,35 @@ def getKsh(PkPa, State):
 # that was easy
 
 
-def PSVareaOrifice(letter, psvTable):
+def PSVareaOrifice(letter):
 # from the PSV designation letter, output the PSV area in MM2
+# create the table
+    data = {"Designation": ["D","E","F","G","H","J","K","L","M","N","P","Q","R","T"],
+        "typicalFlanges": ["1.5D2", "1.5E2", "1.5F3", "1.5G3", "2H3", "3J4", "3K4", "4L6", "4M6", "4N6", "4P6", "6Q8", "6R10", "8T10"],
+        "areaIN2": [0.11, 0.20, 0.31, 0.50, 0.79, 1.29, 1.84, 2.85, 3.60, 4.34, 6.38, 11.05, 16.00, 26.00],
+        "areaMM2": [70.9676, 126.4514, 198.0641, 324.5155, 506.4506, 830.3209, 1185.804, 1840.641, 2322.576, 2799.994, 4116.121, 7129.018, 10322.56, 16774.16] }
+
+    psvTable = pd.DataFrame(data, columns = ["Designation", "typicalFlanges", "areaIN2", "areaMM2"])
+
+
     returnVal = psvTable[psvTable['Designation'].str.contains(letter)]
     return(returnVal.iloc[0]['areaMM2'])
 
 
-def PSVdesignationOrifice(myAreaMM2, psvTable):
+
+
+
+def PSVdesignationOrifice(myAreaMM2):
 # from the aream, output the designation for the next larger orifice
+# create the table
+    data = {"Designation": ["D","E","F","G","H","J","K","L","M","N","P","Q","R","T"],
+        "typicalFlanges": ["1.5D2", "1.5E2", "1.5F3", "1.5G3", "2H3", "3J4", "3K4", "4L6", "4M6", "4N6", "4P6", "6Q8", "6R10", "8T10"],
+        "areaIN2": [0.11, 0.20, 0.31, 0.50, 0.79, 1.29, 1.84, 2.85, 3.60, 4.34, 6.38, 11.05, 16.00, 26.00],
+        "areaMM2": [70.9676, 126.4514, 198.0641, 324.5155, 506.4506, 830.3209, 1185.804, 1840.641, 2322.576, 2799.994, 4116.121, 7129.018, 10322.56, 16774.16] }
+
+    psvTable = pd.DataFrame(data, columns = ["Designation", "typicalFlanges", "areaIN2", "areaMM2"])
+
+
     df_mask = psvTable['areaMM2']>=myAreaMM2
     maskTable = psvTable[df_mask]  # now we can find the n smallest of these
     myPSV = maskTable.nsmallest(1,'areaMM2')
@@ -263,7 +284,7 @@ def PSVsteamSize(Wkg, Pkpa, State):
 
 def apiC(k):
     # SI form
-    C = 0.03948*np.sqrt(k*(2.0/(k+1.0))**((k+1.0)/(k-1.0)))   # C coefficient API 520A fig 32
+    C = 0.03948*math.sqrt(k*(2.0/(k+1.0))**((k+1.0)/(k-1.0)))   # C coefficient API 520A fig 32
     return (C)
 
 
@@ -282,7 +303,7 @@ def PSVvaporFlux(P, Tcelcius, MW, k, Z):
     Kb = 1.0 # do not consider backpressure derating
     Kc = 1.0 # no derating for rupture disc
     C = apiC(k)
-    rootTerm = np.sqrt(T*Z/MW);
+    rootTerm = math.sqrt(T*Z/MW);
     coeffTerm = 1.0 / (C * Kd * P * Kb * Kc)
     #    areaMM2 = W*coeffTerm*rootTerm;
     # W = areaMM2 * flux
@@ -354,13 +375,13 @@ def PSVliquidSize(W, P, Pback, d, mu):
     errConverge = 1.0 
     maxIter = 10
     while (errConverge > convergeEPS) and ( i < maxIter):   
-        rootTerm = np.sqrt(G/(P1-P2));
+        rootTerm = math.sqrt(G/(P1-P2));
         coeffTerm = coeffSI * Q / (Kd * Kw * Kc * Kv)
         areaMM2 = coeffTerm*rootTerm;
 #        diam = sqrt(4.0*areaMM2/pi)/1000;
-        R = Q * 18800 * G / (mu*np.sqrt(areaMM2)); # Reynolds number
+        R = Q * 18800 * G / (mu*math.sqrt(areaMM2)); # Reynolds number
         oldKv = Kv
-        Kv = 1.0 / (0.9935 + 2.878/np.sqrt(R) + 342.75/(R**1.5))
+        Kv = 1.0 / (0.9935 + 2.878/math.sqrt(R) + 342.75/(R**1.5))
         errConverge = abs(oldKv - Kv)
 
         i += 1
@@ -405,9 +426,9 @@ def PSVliquidRate(areaMM2, P, Pback, d, mu):
         coeffTerm = (Kd * Kw * Kc * Kv) / coeffSI
         Q = areaMM2*coeffTerm*rootTerm;   # litres per minute
 #        diam = sqrt(4.0*areaMM2/pi)/1000.0;
-        R = Q * 18800.0 * G / (mu*np.sqrt(areaMM2));  # Reynolds number
+        R = Q * 18800.0 * G / (mu*math.sqrt(areaMM2));  # Reynolds number
         oldKv = Kv
-        Kv = 1.0 / (0.9935 + 2.878/np.sqrt(R) + 342.75/(R**1.5))
+        Kv = 1.0 / (0.9935 + 2.878/math.sqrt(R) + 342.75/(R**1.5))
         errConverge = abs(oldKv - Kv)
         i += 1
         
